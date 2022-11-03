@@ -74,15 +74,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void GenerateWords()
-    {
-        wordsetGenerator.Generate(letters);
-
-        words = wordsetGenerator.wordSet;
-
-        EventsManager.GenerateWordsEvent(words);
-    }
-
     private bool CheckWordGuess(string wordGuess)
     {
         string cleanString = wordGuess.Trim().ToLower();
@@ -109,5 +100,19 @@ public class GameManager : MonoBehaviour
     {
         correctGuesses.Clear();
         EventsManager.ClearEvent();
+    }
+
+    public void GenerateWords()
+    {
+        wordsetGenerator.GenerateFromLetters(letters);
+        words = wordsetGenerator.wordSet;
+        EventsManager.GenerateWordsEvent(words);
+    }
+
+    public void GenerateWords(int length)
+    {
+        wordsetGenerator.GenerateFromLength(length);
+        words = wordsetGenerator.wordSet;
+        EventsManager.GenerateWordsEvent(words);
     }
 }

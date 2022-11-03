@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEngine;
 
 public class WordsetGenerator
 {
@@ -43,12 +44,23 @@ public class WordsetGenerator
         }
     }
 
-    public void Generate(string chars)
+    public void GenerateFromLetters(string chars)
     {
         var filteredDictionary = _dictionary.Where(s => s.Length <= chars.Length && s.Length >= 3);
 
         var mainLookup = chars.ToCharArray().ToLookup(c => c);
 
         wordSet = filteredDictionary.Where(w => w.ToLookup(c => c).All(wc => wc.Count() <= mainLookup[wc.Key].Count())).ToList();
+    }
+
+    public void GenerateFromLength(int length)
+    {
+        var filteredDictionary = _dictionary.Where(s => s.Length <= length && s.Length >= 3).ToList();
+        var candidateWord = filteredDictionary.Where(s => s.Length == length).ToList();
+
+        string selectedWord = candidateWord[Random.Range(1, candidateWord.Count)];
+        var wordLookup = selectedWord.ToCharArray().ToLookup(c => c);
+
+        wordSet = filteredDictionary.Where(w => w.ToLookup(c => c).All(wc => wc.Count() <= wordLookup[wc.Key].Count())).ToList();
     }
 }

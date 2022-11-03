@@ -11,6 +11,7 @@ public class GuessList : MonoBehaviour
     void Start()
     {
         EventsManager.OnCorrectGuess += EventsManager_OnCorrectGuess;
+        EventsManager.OnClearGuessList += EventsManager_OnClearGuessList;
         wordList = GetComponent<TextMeshProUGUI>();
     }
 
@@ -26,8 +27,14 @@ public class GuessList : MonoBehaviour
         wordList.text = wordsString;
     }
 
+    private void EventsManager_OnClearGuessList()
+    {
+        wordList.text = string.Empty;
+    }
+
     private void OnDestroy()
     {
         EventsManager.OnCorrectGuess -= EventsManager_OnCorrectGuess;
+        EventsManager.OnClearGuessList -= EventsManager_OnClearGuessList;
     }
 }
