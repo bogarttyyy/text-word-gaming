@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     private List<string> words;
     public static GameManager Instance { get; private set; }
 
+    private EventsManager eventsManager;
 
     private void Awake()
     {
@@ -32,6 +33,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         wordsetGenerator = new WordsetGenerator();
+        eventsManager = GetComponent<EventsManager>();
     }
 
     public void GenerateWords()
@@ -39,7 +41,7 @@ public class GameManager : MonoBehaviour
         wordsetGenerator.Generate(letters);
 
         words = wordsetGenerator.wordSet;
+
+        EventsManager.GenerateWordsEvent(words);
     }
-
-
 }
