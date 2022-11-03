@@ -5,8 +5,10 @@ using UnityEngine;
 
 public class EventsManager : MonoBehaviour
 {
+    public static event Action<List<string>> OnCorrectGuess;
     public static event Action<List<string>> OnGenerateWords;
-    //public static event Action<Building> OnBuildingFinishedEvent;
+    public static event Action OnIncorrectGuess;
+    public static event Action OnClearGuessList;
 
     public static event Action OnDebugEvent;
 
@@ -28,8 +30,18 @@ public class EventsManager : MonoBehaviour
         OnGenerateWords?.Invoke(words);
     }
 
-    //internal static void BuildingFinishedEvent(Building building)
-    //{
-    //    OnBuildingFinishedEvent?.Invoke(building);
-    //}
+    internal static void CorrectGuessEvent(List<string> correctGuesses)
+    {
+        OnCorrectGuess?.Invoke(correctGuesses);
+    }
+
+    internal static void IncorrectGuessEvent()
+    {
+        OnIncorrectGuess?.Invoke();
+    }
+
+    internal static void ClearEvent()
+    {
+        OnClearGuessList?.Invoke();
+    }
 }
