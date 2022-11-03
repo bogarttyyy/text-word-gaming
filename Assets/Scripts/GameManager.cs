@@ -21,6 +21,12 @@ public class GameManager : MonoBehaviour
     private TMP_Text scoreText;
 
     [SerializeField]
+    private TMP_Text lettersDisplay;
+
+    [SerializeField]
+    private TMP_Text remainingDisplay;
+
+    [SerializeField]
     private string letters;
 
     [SerializeField]
@@ -58,6 +64,9 @@ public class GameManager : MonoBehaviour
         wordsetGenerator = new WordsetGenerator();
         eventsManager = GetComponent<EventsManager>();
         correctGuesses = new List<string>();
+
+        GenerateWords(3);
+        UpdateRemaining();
     }
 
     void Update()
@@ -69,6 +78,8 @@ public class GameManager : MonoBehaviour
                 if (CheckWordGuess(inputField.text))
                 {
                     UpdateScore();
+                    UpdateRemaining();
+
                     correctGuesses.Add(inputField.text.ToLower());
                     EventsManager.CorrectGuessEvent(correctGuesses);
 
@@ -78,6 +89,8 @@ public class GameManager : MonoBehaviour
                         RegenerateWordList();
                         EventsManager.RoundComplete();
                     }
+
+                    UpdateRemaining();
                 }
                 else
                 {
@@ -92,6 +105,11 @@ public class GameManager : MonoBehaviour
             inputField.text = string.Empty;
             RefocusInput();
         }
+
+        //if (Input.anyKeyDown && Input.mo)
+        //{
+        //    RefocusInput();
+        //}
     }
 
     private void UpdateScore()
@@ -150,18 +168,12 @@ public class GameManager : MonoBehaviour
         return 5;
     }
 
-    public void GenerateWords()
-    {
-        wordsetGenerator.GenerateFromLetters(letters);
-        words = wordsetGenerator.wordSet;
-        EventsManager.GenerateWordsEvent(words);
-    }
-
     public void GenerateWords(int length)
     {
         wordsetGenerator.GenerateFromLength(length);
         words = wordsetGenerator.wordSet;
         letters = wordsetGenerator.letters.ToString();
+        ShuffleLetters(letters);
         EventsManager.GenerateWordsEvent(words);
     }
 
@@ -169,5 +181,20 @@ public class GameManager : MonoBehaviour
     {
         inputField.Select();
         inputField.ActivateInputField();
+    }
+
+    public void ShuffleLetters(string letter)
+    {
+        if (string.IsNullOrEmpty(letter))
+        {
+            letter = letters;
+        }
+        
+        lettersDisplay.text = new string(letter.ToCharArray().OrderBy(x => Guid.NewGuid()).ToArray());
+    }
+
+    private void UpdateRemaining()
+    {
+        remainingDisplay.text = $"Remaining: {words.Count() - correctGuesses.Count()}";
     }
 }

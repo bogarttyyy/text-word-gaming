@@ -17,7 +17,7 @@ public class CustomInspector : Editor
 
         if (GUILayout.Button("Generate Word"))
         {
-            gm.GenerateWords();
+            gm.GenerateWords(4);
         }
 
     }
