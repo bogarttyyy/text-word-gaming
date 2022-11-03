@@ -8,7 +8,7 @@ public class WordsetGenerator
 {
     private static readonly List<string> _dictionary = new List<string>();
 
-    public char[] letters;
+    public string letters;
 
     public List<string> wordSet;
 
@@ -46,8 +46,8 @@ public class WordsetGenerator
 
     public void GenerateFromLetters(string chars)
     {
+        letters = chars;
         var filteredDictionary = _dictionary.Where(s => s.Length <= chars.Length && s.Length >= 3);
-
         var mainLookup = chars.ToCharArray().ToLookup(c => c);
 
         wordSet = filteredDictionary.Where(w => w.ToLookup(c => c).All(wc => wc.Count() <= mainLookup[wc.Key].Count())).ToList();
@@ -58,8 +58,8 @@ public class WordsetGenerator
         var filteredDictionary = _dictionary.Where(s => s.Length <= length && s.Length >= 3).ToList();
         var candidateWord = filteredDictionary.Where(s => s.Length == length).ToList();
 
-        string selectedWord = candidateWord[Random.Range(1, candidateWord.Count)];
-        var wordLookup = selectedWord.ToCharArray().ToLookup(c => c);
+        letters = candidateWord[Random.Range(1, candidateWord.Count)];
+        var wordLookup = letters.ToCharArray().ToLookup(c => c);
 
         wordSet = filteredDictionary.Where(w => w.ToLookup(c => c).All(wc => wc.Count() <= wordLookup[wc.Key].Count())).ToList();
     }

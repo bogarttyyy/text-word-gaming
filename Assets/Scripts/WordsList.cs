@@ -14,7 +14,6 @@ public class WordsList : MonoBehaviour
     void Start()
     {
         EventsManager.OnGenerateWords += EventsManager_OnGenerateWords;
-        EventsManager.OnClearGuessList += EventsManager_OnClearGuessList;
         wordList = GetComponent<TextMeshProUGUI>();
     }
 
@@ -28,11 +27,6 @@ public class WordsList : MonoBehaviour
         }
 
         wordList.text = wordsString;
-    }
-
-    private void EventsManager_OnClearGuessList()
-    {
-        wordList.text = string.Empty;
     }
 
     private void OnDestroy()

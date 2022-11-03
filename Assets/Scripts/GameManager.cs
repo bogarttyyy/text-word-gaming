@@ -7,6 +7,8 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEditor.MPE;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
+using UnityEngine.UIElements;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,6 +16,9 @@ public class GameManager : MonoBehaviour
 
     [SerializeField]
     private TMP_InputField inputField;
+
+    [SerializeField]
+    private TMP_Text scoreText;
 
     [SerializeField]
     private string letters;
@@ -24,12 +29,19 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private List<string> correctGuesses;
 
+    [SerializeField]
+    private int round;
+
+    [SerializeField]
+    private int wordScore;
+
     public static GameManager Instance { get; private set; }
 
     private EventsManager eventsManager;
 
     private void Awake()
     {
+        #region Singleton Code
         if (Instance != null && Instance != this)
         {
             Destroy(this);
@@ -38,6 +50,7 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
         }
+        #endregion
     }
 
     void Start()
@@ -55,8 +68,16 @@ public class GameManager : MonoBehaviour
             {
                 if (CheckWordGuess(inputField.text))
                 {
+                    UpdateScore();
                     correctGuesses.Add(inputField.text.ToLower());
                     EventsManager.CorrectGuessEvent(correctGuesses);
+
+                    if (words.Count() == correctGuesses.Count())
+                    {
+                        round += 1;
+                        RegenerateWordList();
+                        EventsManager.RoundComplete();
+                    }
                 }
                 else
                 {
@@ -69,9 +90,14 @@ public class GameManager : MonoBehaviour
             }
 
             inputField.text = string.Empty;
-            inputField.Select();
-            inputField.ActivateInputField();
+            RefocusInput();
         }
+    }
+
+    private void UpdateScore()
+    {
+        wordScore += 1;
+        scoreText.text = $"{wordScore}";
     }
 
     private bool CheckWordGuess(string wordGuess)
@@ -102,6 +128,28 @@ public class GameManager : MonoBehaviour
         EventsManager.ClearEvent();
     }
 
+    public void RegenerateWordList()
+    {
+        int wordLength = AdjustDifficulty();
+        GenerateWords(wordLength);
+        ClearGuesses();
+        Debug.Log("Congrats! On to the next round");
+    }
+
+    private int AdjustDifficulty()
+    {
+        if (round < 4)
+        {
+            return 3;
+        }
+        else if (round < 8)
+        {
+            return 4;
+        }
+
+        return 5;
+    }
+
     public void GenerateWords()
     {
         wordsetGenerator.GenerateFromLetters(letters);
@@ -113,6 +161,13 @@ public class GameManager : MonoBehaviour
     {
         wordsetGenerator.GenerateFromLength(length);
         words = wordsetGenerator.wordSet;
+        letters = wordsetGenerator.letters.ToString();
         EventsManager.GenerateWordsEvent(words);
+    }
+
+    private void RefocusInput()
+    {
+        inputField.Select();
+        inputField.ActivateInputField();
     }
 }
