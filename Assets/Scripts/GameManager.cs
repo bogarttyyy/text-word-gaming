@@ -62,14 +62,15 @@ public class GameManager : MonoBehaviour
                 {
                     EventsManager.IncorrectGuessEvent();
                 }
-
-                inputField.text = string.Empty;
-                inputField.Select();
             }
             else
             {
                 Debug.Log("Empty Enter");
             }
+
+            inputField.text = string.Empty;
+            inputField.Select();
+            inputField.ActivateInputField();
         }
     }
 
