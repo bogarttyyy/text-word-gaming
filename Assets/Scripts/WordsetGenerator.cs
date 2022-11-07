@@ -50,7 +50,7 @@ public class WordsetGenerator
         var filteredDictionary = _dictionary.Where(s => s.Length <= chars.Length && s.Length >= 3);
         var mainLookup = chars.ToCharArray().ToLookup(c => c);
 
-        wordSet = filteredDictionary.Where(w => w.ToLookup(c => c).All(wc => wc.Count() <= mainLookup[wc.Key].Count())).ToList();
+        wordSet = filteredDictionary.Where(w => w.ToLookup(c => c).All(wc => wc.Count() <= mainLookup[wc.Key].Count())).OrderBy(s => s.Length).ToList();
     }
 
     public void GenerateFromLength(int length)
@@ -61,6 +61,6 @@ public class WordsetGenerator
         letters = candidateWord[Random.Range(1, candidateWord.Count)];
         var wordLookup = letters.ToCharArray().ToLookup(c => c);
 
-        wordSet = filteredDictionary.Where(w => w.ToLookup(c => c).All(wc => wc.Count() <= wordLookup[wc.Key].Count())).ToList();
+        wordSet = filteredDictionary.Where(w => w.ToLookup(c => c).All(wc => wc.Count() <= wordLookup[wc.Key].Count())).OrderBy(s => s.Length).ToList();
     }
 }

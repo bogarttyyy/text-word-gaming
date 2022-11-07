@@ -65,6 +65,8 @@ public class GameManager : MonoBehaviour
         eventsManager = GetComponent<EventsManager>();
         correctGuesses = new List<string>();
 
+        scoreText.text = "0";
+
         GenerateWords(3);
         UpdateRemaining();
     }
@@ -73,43 +75,8 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            if (!string.IsNullOrEmpty(inputField.text))
-            {
-                if (CheckWordGuess(inputField.text))
-                {
-                    UpdateScore();
-                    UpdateRemaining();
-
-                    correctGuesses.Add(inputField.text.ToLower());
-                    EventsManager.CorrectGuessEvent(correctGuesses);
-
-                    if (words.Count() == correctGuesses.Count())
-                    {
-                        round += 1;
-                        RegenerateWordList();
-                        EventsManager.RoundComplete();
-                    }
-
-                    UpdateRemaining();
-                }
-                else
-                {
-                    EventsManager.IncorrectGuessEvent();
-                }
-            }
-            else
-            {
-                Debug.Log("Empty Enter");
-            }
-
-            inputField.text = string.Empty;
-            RefocusInput();
+            EnterGuess();
         }
-
-        //if (Input.anyKeyDown && Input.mo)
-        //{
-        //    RefocusInput();
-        //}
     }
 
     private void UpdateScore()
@@ -191,6 +158,46 @@ public class GameManager : MonoBehaviour
         }
         
         lettersDisplay.text = new string(letter.ToCharArray().OrderBy(x => Guid.NewGuid()).ToArray());
+    }
+
+    public void ClearLetters()
+    {
+        inputField.text = string.Empty;
+    }
+
+    public void EnterGuess()
+    {
+        if (!string.IsNullOrEmpty(inputField.text))
+        {
+            if (CheckWordGuess(inputField.text))
+            {
+                UpdateScore();
+                UpdateRemaining();
+
+                correctGuesses.Add(inputField.text.ToLower());
+                EventsManager.CorrectGuessEvent(correctGuesses);
+
+                if (words.Count() == correctGuesses.Count())
+                {
+                    round += 1;
+                    RegenerateWordList();
+                    EventsManager.RoundComplete();
+                }
+
+                UpdateRemaining();
+            }
+            else
+            {
+                EventsManager.IncorrectGuessEvent();
+            }
+        }
+        else
+        {
+            Debug.Log("Empty Enter");
+        }
+
+        inputField.text = string.Empty;
+        RefocusInput();
     }
 
     private void UpdateRemaining()
