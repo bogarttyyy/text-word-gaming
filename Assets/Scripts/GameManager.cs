@@ -27,6 +27,12 @@ public class GameManager : MonoBehaviour
     private TMP_Text remainingDisplay;
 
     [SerializeField]
+    private GameObject victoryScreen;
+
+    [SerializeField]
+    private GameObject gameOverScreen;
+
+    [SerializeField]
     private string letters;
 
     [SerializeField]
@@ -67,7 +73,7 @@ public class GameManager : MonoBehaviour
 
         scoreText.text = "0";
 
-        GenerateWords(3);
+        GenerateWords(4);
         UpdateRemaining();
     }
 
@@ -179,12 +185,9 @@ public class GameManager : MonoBehaviour
 
                 if (words.Count() == correctGuesses.Count())
                 {
-                    round += 1;
-                    RegenerateWordList();
                     EventsManager.RoundComplete();
+                    victoryScreen.SetActive(true);
                 }
-
-                UpdateRemaining();
             }
             else
             {
@@ -200,8 +203,23 @@ public class GameManager : MonoBehaviour
         RefocusInput();
     }
 
+    public void NextRound()
+    {
+        round += 1;
+        RegenerateWordList();
+        UpdateRemaining();
+        victoryScreen.SetActive(false);
+    }
+
     private void UpdateRemaining()
     {
         remainingDisplay.text = $"Remaining: {words.Count() - correctGuesses.Count()}";
+    }
+
+    public void NewGame()
+    {
+        round = 1;
+        scoreText.text = "0";
+        inputField.text = string.Empty;
     }
 }
