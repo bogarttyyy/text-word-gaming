@@ -104,7 +104,26 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            EnterGuess();
+            if (victoryScreen.activeSelf)
+            {
+                NextRound();
+            }
+            else if (gameOverScreen.activeSelf)
+            {
+                NewGame();
+            }
+            else
+            {
+                EnterGuess();
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (gameOverScreen.activeSelf)
+            {
+                NewGame();
+            }
         }
     }
 
