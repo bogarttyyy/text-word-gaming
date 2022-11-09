@@ -8,6 +8,7 @@ public class EventsManager : MonoBehaviour
     public static event Action<List<string>> OnCorrectGuess;
     public static event Action<List<string>> OnGenerateWords;
     public static event Action OnIncorrectGuess;
+    public static event Action OnOutOfLives;
     public static event Action OnClearGuessList;
     public static event Action OnRoundComplete;
 
@@ -39,6 +40,11 @@ public class EventsManager : MonoBehaviour
     internal static void IncorrectGuessEvent()
     {
         OnIncorrectGuess?.Invoke();
+    }
+
+    internal static void OutOfLivesEvent()
+    {
+        OnOutOfLives?.Invoke();
     }
 
     internal static void ClearEvent()

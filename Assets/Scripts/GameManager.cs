@@ -1,14 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using TMPro;
-using Unity.VisualScripting;
-using UnityEditor.MPE;
 using UnityEngine;
-using UnityEngine.SocialPlatforms.Impl;
-using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -18,13 +13,19 @@ public class GameManager : MonoBehaviour
     private TMP_InputField inputField;
 
     [SerializeField]
-    private TMP_Text scoreText;
+    private TMP_Text scoreDisplay;
 
     [SerializeField]
     private TMP_Text lettersDisplay;
 
     [SerializeField]
     private TMP_Text remainingDisplay;
+
+    [SerializeField]
+    private TMP_Text livesDisplay;
+
+    [SerializeField]
+    private TMP_Text finalScoreDisplay;
 
     [SerializeField]
     private GameObject victoryScreen;
@@ -50,6 +51,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     private EventsManager eventsManager;
+    private int lives;
 
     private void Awake()
     {
@@ -71,10 +73,31 @@ public class GameManager : MonoBehaviour
         eventsManager = GetComponent<EventsManager>();
         correctGuesses = new List<string>();
 
-        scoreText.text = "0";
+        ResetGame();
 
         GenerateWords(4);
         UpdateRemaining();
+        UpdateLives();
+
+        EventsManager.OnRoundComplete += EventsManager_OnRoundComplete;
+        EventsManager.OnOutOfLives += EventsManager_OnOutOfLives;
+        EventsManager.OnIncorrectGuess += EventsManager_OnIncorrectGuess;
+    }
+
+    private void EventsManager_OnRoundComplete()
+    {
+        victoryScreen.SetActive(true);
+    }
+
+    private void EventsManager_OnOutOfLives()
+    {
+        finalScoreDisplay.text = $"Final Score: {wordScore}";
+        gameOverScreen.SetActive(true);
+    }
+
+    private void EventsManager_OnIncorrectGuess()
+    {
+        UpdateLives();
     }
 
     void Update()
@@ -87,8 +110,19 @@ public class GameManager : MonoBehaviour
 
     private void UpdateScore()
     {
-        wordScore += 1;
-        scoreText.text = $"{wordScore}";
+        wordScore += 100 * ScoreMultipler(inputField.text);
+        scoreDisplay.text = $"Score: {wordScore}";
+    }
+
+    private int ScoreMultipler(string word)
+    {
+        return word.Length switch
+        {
+            4 => 2,
+            5 => 4,
+            6 => 8,
+            _ => 1,
+        };
     }
 
     private bool CheckWordGuess(string wordGuess)
@@ -107,6 +141,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            lives -= 1;
             Debug.Log($"Try again");
         }
 
@@ -131,14 +166,14 @@ public class GameManager : MonoBehaviour
     {
         if (round < 4)
         {
-            return 3;
+            return 4;
         }
         else if (round < 8)
         {
-            return 4;
+            return 5;
         }
 
-        return 5;
+        return 6;
     }
 
     public void GenerateWords(int length)
@@ -166,7 +201,7 @@ public class GameManager : MonoBehaviour
         lettersDisplay.text = new string(letter.ToCharArray().OrderBy(x => Guid.NewGuid()).ToArray());
     }
 
-    public void ClearLetters()
+    public void ClearField()
     {
         inputField.text = string.Empty;
     }
@@ -186,12 +221,16 @@ public class GameManager : MonoBehaviour
                 if (words.Count() == correctGuesses.Count())
                 {
                     EventsManager.RoundComplete();
-                    victoryScreen.SetActive(true);
                 }
             }
             else
             {
                 EventsManager.IncorrectGuessEvent();
+
+                if (lives < 1)
+                {
+                    EventsManager.OutOfLivesEvent();
+                }
             }
         }
         else
@@ -216,10 +255,39 @@ public class GameManager : MonoBehaviour
         remainingDisplay.text = $"Remaining: {words.Count() - correctGuesses.Count()}";
     }
 
+    private void UpdateLives()
+    {
+        livesDisplay.text = $"Lives: {lives}";
+    }
+
     public void NewGame()
     {
+        ResetGame();
+
+        RegenerateWordList();
+        UpdateRemaining();
+        UpdateLives();
+
+        gameOverScreen.SetActive(false);
+    }
+
+    private void ResetGame()
+    {
+        lives = 3;
         round = 1;
-        scoreText.text = "0";
+        scoreDisplay.text = "Score: 0";
         inputField.text = string.Empty;
+    }
+
+    public void QuitToTitleScreen()
+    {
+        SceneManager.LoadScene("Menu");
+    }
+
+    private void OnDestroy()
+    {
+        EventsManager.OnRoundComplete -= EventsManager_OnRoundComplete;
+        EventsManager.OnOutOfLives -= EventsManager_OnOutOfLives;
+        EventsManager.OnIncorrectGuess -= EventsManager_OnIncorrectGuess;
     }
 }
