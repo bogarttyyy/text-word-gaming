@@ -127,6 +127,22 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        if (Input.anyKeyDown)
+        {
+            if (!(Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Backspace)))
+            {
+                EventsManager.TextInputEvent();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Backspace))
+            {
+                EventsManager.TextDeleteEvent();
+            }
+        }
+    }
+
     private void UpdateScore()
     {
         wordScore += 100 * ScoreMultipler(inputField.text);

@@ -12,6 +12,9 @@ public class EventsManager : MonoBehaviour
     public static event Action OnClearGuessList;
     public static event Action OnRoundComplete;
 
+    public static event Action OnTextInput;
+    public static event Action OnTextDelete;
+
     public static event Action OnDebugEvent;
 
     private void Update()
@@ -55,5 +58,15 @@ public class EventsManager : MonoBehaviour
     internal static void RoundComplete()
     {
         OnRoundComplete?.Invoke();
+    }
+
+    internal static void TextInputEvent()
+    {
+        OnTextInput?.Invoke();
+    }
+
+    internal static void TextDeleteEvent()
+    {
+        OnTextDelete?.Invoke();
     }
 }
