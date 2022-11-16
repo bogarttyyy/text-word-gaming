@@ -48,6 +48,12 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private int wordScore;
 
+    [SerializeField]
+    private LettersSelection textDisplay;
+
+    [SerializeField]
+    private string debugWord;
+
     public static GameManager Instance { get; private set; }
 
     private EventsManager eventsManager;
@@ -213,10 +219,24 @@ public class GameManager : MonoBehaviour
 
     public void GenerateWords(int length)
     {
-        wordsetGenerator.GenerateFromLength(length);
+        if (!string.IsNullOrEmpty(debugWord))
+        {
+            wordsetGenerator.GenerateFromLetters(debugWord);
+        }
+        else
+        {   
+            wordsetGenerator.GenerateFromLength(length);
+        }
+
         words = wordsetGenerator.wordSet;
         letters = wordsetGenerator.letters.ToString();
-        ShuffleLetters(letters);
+
+        textDisplay.UpdateLetters(letters);
+        //textDisplay.transform.position = new Vector2(0, 0);
+        textDisplay.transform.position = new Vector2((letters.Length - 1) * -1.25f / 2, 0);
+        //textDisplay.ShuffleLetters();
+        //ShuffleLetters(letters);
+
         EventsManager.GenerateWordsEvent(words);
     }
 
@@ -232,8 +252,10 @@ public class GameManager : MonoBehaviour
         {
             letter = letters;
         }
-        
-        lettersDisplay.text = new string(letter.ToCharArray().OrderBy(x => Guid.NewGuid()).ToArray());
+
+        //lettersDisplay.text = new string(letter.ToCharArray().OrderBy(x => Guid.NewGuid()).ToArray());
+
+        textDisplay.ShuffleLetters();
     }
 
     public void ClearField()
@@ -243,14 +265,16 @@ public class GameManager : MonoBehaviour
 
     public void EnterGuess()
     {
-        if (!string.IsNullOrEmpty(inputField.text))
+        string wordGuess = textDisplay.GetGuess();
+
+        if (!string.IsNullOrEmpty(wordGuess))
         {
-            if (CheckWordGuess(inputField.text))
+            if (CheckWordGuess(wordGuess))
             {
                 UpdateScore();
                 UpdateRemaining();
 
-                correctGuesses.Add(inputField.text.ToLower());
+                correctGuesses.Add(wordGuess);
                 EventsManager.CorrectGuessEvent(correctGuesses);
 
                 if (words.Count() == correctGuesses.Count())
@@ -267,6 +291,8 @@ public class GameManager : MonoBehaviour
                     EventsManager.OutOfLivesEvent();
                 }
             }
+
+            textDisplay.ClearTyped();
         }
         else
         {
