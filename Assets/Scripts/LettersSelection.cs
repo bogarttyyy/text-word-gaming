@@ -79,56 +79,19 @@ public class LettersSelection : MonoBehaviour
             {
                 if (Input.GetKeyDown(key))
                 {
-                    char typed = TypeLetter(key);
-
-                    LetterPosition letPos = GetNextAvailablePosition();
-
-                    LetterObj letterObj = letterDisplay.FirstOrDefault(f => f.GetChar() == typed && !f.isTyped);
-                    letterObj.isTyped = true;
-                    letPos.isOccupied = true;
-                    letterObj.SetPosition(letPos.position);
+                    MoveToNextAvailablePosition(TypedLetter(key));
                 }
             }
         }
     }
 
-    private void FixedUpdate()
-    {
-        //UpdateVisual();
-    }
-
-    private void UpdateVisual()
-    {
-        foreach (var letter in typedLetters)
-        {
-            LetterObj obj = letterDisplay.FirstOrDefault(l => l.GetChar() == letter);
-            if (obj != null)
-            {
-                MoveToNextAvailablePosition(obj);
-            }
-
-            //Vector3.MoveTowards(obj.transform.position, new Vector3(obj.transform.position.x, obj.transform.position.y - 1f), 0.1f);
-        }
-
-        //foreach (var letter in displayedLetters)
-        //{
-        //    LetterObj obj = letterDisplay.Find(l => l.GetChar() == letter && l.isTyped);
-
-        //    if (obj != null)
-        //    {
-        //        if (obj.transform.position != obj.displayPosition)
-        //        {
-        //            obj.isTyped = false;
-        //            Vector3.Lerp(obj.transform.position, obj.displayPosition, 1f);
-        //        }
-        //    }
-        //}
-    }
-
-    private void MoveToNextAvailablePosition(LetterObj obj)
+    private void MoveToNextAvailablePosition(char typed)
     {
         LetterPosition letPos = GetNextAvailablePosition();
-        obj.transform.localPosition = Vector3.MoveTowards(obj.displayPosition, letPos.position, 1f);
+
+        LetterObj letterObj = letterDisplay.FirstOrDefault(f => f.GetChar() == typed && !f.isTyped);
+
+        letPos.SetObject(letterObj);
     }
 
     private LetterPosition GetNextAvailablePosition()
@@ -140,11 +103,11 @@ public class LettersSelection : MonoBehaviour
             pos.isOccupied = true;
             return pos;
         }
-        Debug.Log("HERE");
+
         return typedPositions.Last();
     }
 
-    private char TypeLetter(KeyCode key)
+    private char TypedLetter(KeyCode key)
     {
         char typedKey = key.ToString().ToLower()[0];
 
@@ -170,12 +133,26 @@ public class LettersSelection : MonoBehaviour
                 typedLetters.RemoveAt(typedLetters.IndexOf(deletedLetter));
                 displayedLetters.Add(deletedLetter);
             }
+
+            LetterPosition charPos = GetLastCharTyped();
+            charPos?.ClearObject();
         }
+    }
+
+    private LetterPosition GetLastCharTyped()
+    {
+        if (typedPositions.Any())
+        {
+            return typedPositions.LastOrDefault(f => f.letterObj != null);
+        }
+
+        return null;
     }
 
     public void UpdateLetters(string letters)
     {
         validKeys.Clear();
+        ClearGiven();
 
         givenLetters = letters;
 
@@ -202,6 +179,16 @@ public class LettersSelection : MonoBehaviour
 
         transform.position = new Vector2((letters.Length - 1) * -LETTER_SPACING / 2, 0);
 
+    }
+
+    private void ClearGiven()
+    {
+        foreach (var item in letterDisplay)
+        {
+            Destroy(item.gameObject);
+        }
+
+        letterDisplay.Clear();
     }
 
     public List<char> ShuffleLetters(char[] text)
@@ -250,7 +237,12 @@ public class LettersSelection : MonoBehaviour
 
     internal void ClearTyped()
     {
-        displayedLetters = new List<char>(typedLetters);
+        displayedLetters.AddRange(typedLetters);
         typedLetters.Clear();
+
+        foreach (var item in typedPositions)
+        {
+            item.ClearObject();
+        }
     }
 }

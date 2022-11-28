@@ -257,6 +257,7 @@ public class GameManager : MonoBehaviour
     public void ClearField()
     {
         inputField.text = string.Empty;
+        textDisplay.ClearTyped();
     }
 
     public void EnterGuess()

@@ -2913,7 +2913,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -546, y: 35.047638}
+  m_AnchoredPosition: {x: -560.18, y: 47.044}
   m_SizeDelta: {x: 317.6414, y: 592.8516}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1268627887
@@ -3647,7 +3647,7 @@ MonoBehaviour:
   round: 0
   wordScore: 0
   textDisplay: {fileID: 351532663}
-  debugWord: foot
+  debugWord: 
 --- !u!4 &1422255735
 Transform:
   m_ObjectHideFlags: 0
@@ -4573,7 +4573,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 542.91, y: 306.47}
+  m_AnchoredPosition: {x: 565.73, y: 318.47}
   m_SizeDelta: {x: 325.4708, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1885758722

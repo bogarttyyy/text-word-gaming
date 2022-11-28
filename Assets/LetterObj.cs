@@ -13,7 +13,7 @@ public class LetterObj : MonoBehaviour
 
     private void Start()
     {
-        displayPosition = transform.position;
+        displayPosition = transform.localPosition;
         isTyped = false;
     }
 
@@ -21,7 +21,12 @@ public class LetterObj : MonoBehaviour
     {
         if (typedPosition != Vector3.zero && displayPosition != typedPosition)
         {
-            transform.localPosition = Vector3.MoveTowards(transform.localPosition, typedPosition, 0.5f);
+            transform.localPosition = Vector3.MoveTowards(transform.localPosition, typedPosition, 0.2f);
+        }
+
+        if (typedPosition == Vector3.zero)
+        {
+            transform.localPosition = displayPosition;
         }
     }
 
@@ -32,6 +37,13 @@ public class LetterObj : MonoBehaviour
 
     public void SetPosition(Vector3 position)
     {
+        isTyped = true;
         typedPosition = position;
+    }
+
+    public void ResetPosition()
+    {
+        isTyped = false;
+        typedPosition = Vector3.zero;
     }
 }
