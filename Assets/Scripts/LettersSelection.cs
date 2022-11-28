@@ -150,6 +150,8 @@ public class LettersSelection : MonoBehaviour
 
         displayedLetters = ShuffleLetters(givenLetters.ToCharArray());
 
+        validKeys.AddRange(displayedLetters.Distinct().Select(l => Enum.Parse<KeyCode>($"{l}", true)));
+
         for (int i = 0; i < displayedLetters.Count; i++)
         {
             int indexNumber = LetterToIndex(displayedLetters[i]);
@@ -160,8 +162,6 @@ public class LettersSelection : MonoBehaviour
 
             KeyCode key = Enum.Parse<KeyCode>($"{displayedLetters[i]}", true);
             letter.keyCode = key;
-
-            validKeys.Add(key);
 
             // Show Letters in the display
             letterDisplay.Add(letter);
