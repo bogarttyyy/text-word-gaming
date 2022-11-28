@@ -232,10 +232,6 @@ public class GameManager : MonoBehaviour
         letters = wordsetGenerator.letters.ToString();
 
         textDisplay.UpdateLetters(letters);
-        //textDisplay.transform.position = new Vector2(0, 0);
-        textDisplay.transform.position = new Vector2((letters.Length - 1) * -1.25f / 2, 0);
-        //textDisplay.ShuffleLetters();
-        //ShuffleLetters(letters);
 
         EventsManager.GenerateWordsEvent(words);
     }

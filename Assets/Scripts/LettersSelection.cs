@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.U2D.Animation;
@@ -15,6 +16,8 @@ public class LettersSelection : MonoBehaviour
     private const float LETTER_MOVE_POINT = 0f;
 
     private KeyCode[] allKeys;
+
+    private List<LetterPosition> typedPositions = new();
 
     public string givenLetters;
 
@@ -76,46 +79,72 @@ public class LettersSelection : MonoBehaviour
             {
                 if (Input.GetKeyDown(key))
                 {
-                    TypeLetter(key);
+                    char typed = TypeLetter(key);
+
+                    LetterPosition letPos = GetNextAvailablePosition();
+
+                    LetterObj letterObj = letterDisplay.FirstOrDefault(f => f.GetChar() == typed && !f.isTyped);
+                    letterObj.isTyped = true;
+                    letPos.isOccupied = true;
+                    letterObj.SetPosition(letPos.position);
                 }
             }
         }
+    }
 
-        UpdateVisual();
+    private void FixedUpdate()
+    {
+        //UpdateVisual();
     }
 
     private void UpdateVisual()
     {
         foreach (var letter in typedLetters)
         {
-            LetterObj obj = letterDisplay.FirstOrDefault(l => l.GetChar() == letter && !l.isTyped);
-
+            LetterObj obj = letterDisplay.FirstOrDefault(l => l.GetChar() == letter);
             if (obj != null)
             {
-                obj.isTyped = true;
-                Vector3.Lerp(obj.transform.position, new Vector3(obj.transform.position.x, obj.transform.position.y - 1f), 1f);
+                MoveToNextAvailablePosition(obj);
             }
-
 
             //Vector3.MoveTowards(obj.transform.position, new Vector3(obj.transform.position.x, obj.transform.position.y - 1f), 0.1f);
         }
 
-        foreach (var letter in displayedLetters)
-        {
-            LetterObj obj = letterDisplay.Find(l => l.GetChar() == letter && l.isTyped);
+        //foreach (var letter in displayedLetters)
+        //{
+        //    LetterObj obj = letterDisplay.Find(l => l.GetChar() == letter && l.isTyped);
 
-            if (obj != null)
-            {
-                if (obj.transform.position != obj.displayPosition)
-                {
-                    obj.isTyped = false;
-                    Vector3.Lerp(obj.transform.position, obj.displayPosition, 1f);
-                }
-            }
-        }
+        //    if (obj != null)
+        //    {
+        //        if (obj.transform.position != obj.displayPosition)
+        //        {
+        //            obj.isTyped = false;
+        //            Vector3.Lerp(obj.transform.position, obj.displayPosition, 1f);
+        //        }
+        //    }
+        //}
     }
 
-    private void TypeLetter(KeyCode key)
+    private void MoveToNextAvailablePosition(LetterObj obj)
+    {
+        LetterPosition letPos = GetNextAvailablePosition();
+        obj.transform.localPosition = Vector3.MoveTowards(obj.displayPosition, letPos.position, 1f);
+    }
+
+    private LetterPosition GetNextAvailablePosition()
+    {
+        var pos = typedPositions.FirstOrDefault(p => !p.isOccupied);
+        
+        if (pos != null)
+        {
+            pos.isOccupied = true;
+            return pos;
+        }
+        Debug.Log("HERE");
+        return typedPositions.Last();
+    }
+
+    private char TypeLetter(KeyCode key)
     {
         char typedKey = key.ToString().ToLower()[0];
 
@@ -126,6 +155,8 @@ public class LettersSelection : MonoBehaviour
             displayedLetters.RemoveAt(displayedLetters.IndexOf(letterChar));
             typedLetters.Add(letterChar);
         }
+
+        return typedKey;
     }
 
     private void DeleteCharacter()
@@ -158,7 +189,9 @@ public class LettersSelection : MonoBehaviour
 
             LetterObj letter = Instantiate(letterObj, transform);
             letter.GetComponent<SpriteRenderer>().sprite = letterSprites[indexNumber];
-            letter.transform.localPosition = new Vector3(i * LETTER_SPACING, 0, 0);
+            letter.transform.localPosition = new Vector2(i * LETTER_SPACING, 0);
+
+            typedPositions.Add(new LetterPosition(new Vector2(i * LETTER_SPACING, -1.25f)));
 
             KeyCode key = Enum.Parse<KeyCode>($"{displayedLetters[i]}", true);
             letter.keyCode = key;
@@ -166,6 +199,9 @@ public class LettersSelection : MonoBehaviour
             // Show Letters in the display
             letterDisplay.Add(letter);
         }
+
+        transform.position = new Vector2((letters.Length - 1) * -LETTER_SPACING / 2, 0);
+
     }
 
     public List<char> ShuffleLetters(char[] text)
