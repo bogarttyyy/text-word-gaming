@@ -1,12 +1,8 @@
 using Assets.Scripts;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEditor;
-using UnityEditor.U2D.Animation;
 using UnityEngine;
 
 public class LettersSelection : MonoBehaviour

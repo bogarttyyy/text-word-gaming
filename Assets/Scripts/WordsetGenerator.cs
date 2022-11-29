@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-
+using UnityEngine.Networking;
+/// <summary>
+/// REIMPLEMENT TO COROUTINES
+/// </summary>
 public class WordsetGenerator
 {
     private static readonly List<string> _dictionary = new List<string>();
@@ -16,32 +19,48 @@ public class WordsetGenerator
     {  
         if (string.IsNullOrEmpty(path))
         {
-            ReadCSV("Assets/WordAssets/10k-sfw.txt");
+            ReadCSV(Path.Combine(Application.streamingAssetsPath, "WordAssets/10k-sfw.txt"));
         }
-        else
-        {
-            ReadCSV(path);
-        }
+        //else
+        //{
+        //    ReadCSV(path);
+        //}
     }
 
     private static void ReadCSV(string path)
     {
-        StreamReader streamReader = new StreamReader(path);
-        bool eof = false;
+        string[] textLines;
 
-        while (!eof)
-        {
-            string dataString = streamReader.ReadLine();
-            if (dataString == null)
-            {
-                //eof = true;
-                return;
-            }
+        #region WebGL Build
+        UnityWebRequest uwr = UnityWebRequest.Get(path);
 
-            string[] values = dataString.Split('\u002C');
+        uwr.SendWebRequest();
+        textLines = uwr.downloadHandler.text.Split('\u002C');
+        _dictionary.AddRange(textLines);
 
-            _dictionary.AddRange(values);
-        }
+       
+
+        #endregion
+
+        #region Windows Build
+
+        //StreamReader streamReader = new(path);
+        //bool eof = false;
+
+        //while (!eof)
+        //{
+        //    string dataString = streamReader.ReadLine();
+        //    if (dataString == null)
+        //    {
+        //        //eof = true;
+        //        return;
+        //    }
+
+        //    string[] values = dataString.Split('\u002C');
+
+        //    _dictionary.AddRange(values);
+        //}
+        #endregion
     }
 
     public void GenerateFromLetters(string chars)
