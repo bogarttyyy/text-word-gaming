@@ -24,6 +24,11 @@ public class LetterObj : MonoBehaviour
             transform.localPosition = Vector3.MoveTowards(transform.localPosition, typedPosition, 0.2f);
         }
 
+        if (transform.localPosition != displayPosition && !isTyped)
+        {
+            transform.localPosition = Vector3.MoveTowards(transform.localPosition, displayPosition, 1f);
+        }
+
         if (typedPosition == Vector3.zero)
         {
             transform.localPosition = displayPosition;

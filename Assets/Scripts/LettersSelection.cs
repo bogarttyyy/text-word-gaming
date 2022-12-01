@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SubsystemsImplementation;
 
 public class LettersSelection : MonoBehaviour
 {
@@ -44,6 +45,7 @@ public class LettersSelection : MonoBehaviour
     /// <summary>
     /// This contains the valid letters (that is available for selection)
     /// </summary>
+    [SerializeField]
     private List<KeyCode> validKeys = new();
 
 
@@ -79,8 +81,6 @@ public class LettersSelection : MonoBehaviour
                 }
             }
         }
-
-        UpdateDisplay();
     }
 
     private void MoveToNextAvailablePosition(char typed)
@@ -89,7 +89,10 @@ public class LettersSelection : MonoBehaviour
 
         LetterObj letterObj = letterObjs.FirstOrDefault(f => f.GetChar() == typed && !f.isTyped);
 
-        letPos.SetObject(letterObj);
+        if (letterObj != null)
+        {
+            letPos.SetObject(letterObj);
+        }
     }
 
     private LetterPosition GetNextAvailablePosition()
@@ -137,17 +140,6 @@ public class LettersSelection : MonoBehaviour
         }
     }
 
-    private void UpdateDisplay()
-    {
-        foreach (var obj in letterObjs)
-        {
-            if (obj.transform.localPosition != obj.displayPosition && !obj.isTyped)
-            {
-                obj.transform.localPosition = Vector3.MoveTowards(obj.transform.localPosition, obj.displayPosition, 2f);
-            }
-        }
-    }
-
     private LetterPosition GetLastCharTyped()
     {
         if (typedPositions.Any())
@@ -160,7 +152,6 @@ public class LettersSelection : MonoBehaviour
 
     public void UpdateLetters(string letters)
     {
-        validKeys.Clear();
         ClearGiven();
 
         givenLetters = letters;
@@ -192,12 +183,15 @@ public class LettersSelection : MonoBehaviour
 
     private void ClearGiven()
     {
-        foreach (var item in letterObjs)
-        {
-            Destroy(item.gameObject);
-        }
+        validKeys.Clear();
 
+        letterObjs.ForEach(t => Destroy(t.gameObject));
         letterObjs.Clear();
+
+        if (typedPositions.Any())
+        {
+            typedPositions.Clear();
+        }
     }
 
     public List<char> ShuffleLetters(char[] text)
