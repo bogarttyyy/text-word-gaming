@@ -48,7 +48,7 @@ public class LettersSelection : MonoBehaviour
 
 
     [SerializeField]
-    private List<LetterObj> letterDisplay = new();
+    private List<LetterObj> letterObjs = new();
 
 
     private void Start()
@@ -66,7 +66,7 @@ public class LettersSelection : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            ShuffleLetters();
+            ShuffleDisplay();
         }
 
         if (Input.anyKeyDown)
@@ -79,13 +79,15 @@ public class LettersSelection : MonoBehaviour
                 }
             }
         }
+
+        UpdateDisplay();
     }
 
     private void MoveToNextAvailablePosition(char typed)
     {
         LetterPosition letPos = GetNextAvailablePosition();
 
-        LetterObj letterObj = letterDisplay.FirstOrDefault(f => f.GetChar() == typed && !f.isTyped);
+        LetterObj letterObj = letterObjs.FirstOrDefault(f => f.GetChar() == typed && !f.isTyped);
 
         letPos.SetObject(letterObj);
     }
@@ -135,6 +137,17 @@ public class LettersSelection : MonoBehaviour
         }
     }
 
+    private void UpdateDisplay()
+    {
+        foreach (var obj in letterObjs)
+        {
+            if (obj.transform.localPosition != obj.displayPosition && !obj.isTyped)
+            {
+                obj.transform.localPosition = Vector3.MoveTowards(obj.transform.localPosition, obj.displayPosition, 2f);
+            }
+        }
+    }
+
     private LetterPosition GetLastCharTyped()
     {
         if (typedPositions.Any())
@@ -153,10 +166,7 @@ public class LettersSelection : MonoBehaviour
         givenLetters = letters;
 
         displayedLetters = ShuffleLetters(givenLetters.ToCharArray());
-        foreach (var item in displayedLetters)
-        {
-            Debug.Log(item);
-        }
+
         validKeys.AddRange(displayedLetters.Distinct().Select(l => Enum.Parse<KeyCode>($"{l}", true)));
 
         for (int i = 0; i < displayedLetters.Count; i++)
@@ -173,7 +183,7 @@ public class LettersSelection : MonoBehaviour
             letter.keyCode = key;
 
             // Show Letters in the display
-            letterDisplay.Add(letter);
+            letterObjs.Add(letter);
         }
 
         transform.position = new Vector2((letters.Length - 1) * -LETTER_SPACING / 2, 0);
@@ -182,12 +192,12 @@ public class LettersSelection : MonoBehaviour
 
     private void ClearGiven()
     {
-        foreach (var item in letterDisplay)
+        foreach (var item in letterObjs)
         {
             Destroy(item.gameObject);
         }
 
-        letterDisplay.Clear();
+        letterObjs.Clear();
     }
 
     public List<char> ShuffleLetters(char[] text)
@@ -208,6 +218,18 @@ public class LettersSelection : MonoBehaviour
         }
 
         return givenLetters.ToCharArray().OrderBy(x => Guid.NewGuid()).ToList();
+    }
+
+    internal void ShuffleDisplay()
+    {
+        List<Vector3> coordinates = letterObjs.Select(o => o.displayPosition).ToList();
+
+        letterObjs = letterObjs.OrderBy(l => Guid.NewGuid()).ToList();
+
+        for (int i = 0; i < letterObjs.Count; i++)
+        {
+            letterObjs[i].displayPosition = coordinates[i];
+        }
     }
 
     private int LetterToIndex(char letter)

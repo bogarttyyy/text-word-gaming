@@ -237,9 +237,6 @@ public class GameManager : MonoBehaviour
     {
         while (wordsetGenerator.wordSet == null || !wordsetGenerator.wordSet.Any())
         {
-            Debug.Log(wordsetGenerator.wordSet);
-            Debug.Log(wordsetGenerator.wordSet.Any());
-            Debug.Log(wordsetGenerator.wordSet == null || !wordsetGenerator.wordSet.Any());
             yield return new WaitForSeconds(0.5f);
         }
 
@@ -251,6 +248,7 @@ public class GameManager : MonoBehaviour
         textDisplay.UpdateLetters(letters);
 
         EventsManager.GenerateWordsEvent(words);
+        UpdateRemaining();
     }
 
     private void RefocusInput()
@@ -266,9 +264,7 @@ public class GameManager : MonoBehaviour
             letter = letters;
         }
 
-        //lettersDisplay.text = new string(letter.ToCharArray().OrderBy(x => Guid.NewGuid()).ToArray());
-
-        textDisplay.ShuffleLetters();
+        textDisplay.ShuffleDisplay();
     }
 
     public void ClearField()
@@ -285,11 +281,11 @@ public class GameManager : MonoBehaviour
         {
             if (CheckWordGuess(wordGuess))
             {
-                UpdateScore();
-                UpdateRemaining();
-
                 correctGuesses.Add(wordGuess);
                 EventsManager.CorrectGuessEvent(correctGuesses);
+
+                UpdateScore();
+                UpdateRemaining();
 
                 if (words.Count() == correctGuesses.Count())
                 {

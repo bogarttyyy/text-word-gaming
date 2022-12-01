@@ -593,7 +593,7 @@ MonoBehaviour:
   - {fileID: -1307336619, guid: 48a228257268c80448ce8109d15d31ac, type: 3}
   - {fileID: -1570978118, guid: 48a228257268c80448ce8109d15d31ac, type: 3}
   - {fileID: 129597800, guid: 48a228257268c80448ce8109d15d31ac, type: 3}
-  letterDisplay: []
+  letterObjs: []
 --- !u!4 &351532664
 Transform:
   m_ObjectHideFlags: 0
@@ -2948,7 +2948,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: List of Guess
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3111,8 +3111,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1422255734}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: ShuffleLetters
-        m_Mode: 5
+        m_MethodName: EnterGuess
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3688,6 +3688,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b3f9bd8bc8d0a342851ba4123d9fa09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dictionary: []
   letters: 
   wordSet: []
   textPath: 
