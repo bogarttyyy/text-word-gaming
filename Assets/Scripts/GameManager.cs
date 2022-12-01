@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -7,6 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+
     private WordsetGenerator wordsetGenerator;
 
     [SerializeField]
@@ -75,7 +77,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        wordsetGenerator = new WordsetGenerator();
+        wordsetGenerator = GetComponent<WordsetGenerator>();
         eventsManager = GetComponent<EventsManager>();
         correctGuesses = new List<string>();
 
@@ -228,8 +230,23 @@ public class GameManager : MonoBehaviour
             wordsetGenerator.GenerateFromLength(length);
         }
 
+        StartCoroutine(SetWords());
+    }
+
+    private IEnumerator SetWords()
+    {
+        while (wordsetGenerator.wordSet == null || !wordsetGenerator.wordSet.Any())
+        {
+            Debug.Log(wordsetGenerator.wordSet);
+            Debug.Log(wordsetGenerator.wordSet.Any());
+            Debug.Log(wordsetGenerator.wordSet == null || !wordsetGenerator.wordSet.Any());
+            yield return new WaitForSeconds(0.5f);
+        }
+
         words = wordsetGenerator.wordSet;
         letters = wordsetGenerator.letters.ToString();
+
+        Debug.Log($"Letters set: {letters}");
 
         textDisplay.UpdateLetters(letters);
 

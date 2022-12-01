@@ -1,70 +1,78 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UIElements;
+
 /// <summary>
 /// REIMPLEMENT TO COROUTINES
 /// </summary>
-public class WordsetGenerator
+public class WordsetGenerator : MonoBehaviour
 {
-    private static readonly List<string> _dictionary = new List<string>();
+    [SerializeField]
+    private List<string> _dictionary = new();
 
     public string letters;
 
     public List<string> wordSet;
 
-    public WordsetGenerator(string path = null)
-    {  
-        if (string.IsNullOrEmpty(path))
-        {
-            ReadCSV(Path.Combine(Application.streamingAssetsPath, "WordAssets/10k-sfw.txt"));
-        }
-        //else
-        //{
-        //    ReadCSV(path);
-        //}
+    [SerializeField]
+    private string textPath;
+
+    private UnityWebRequest uwr;
+
+    public bool IsDone { get; internal set; } = false;
+
+    private void Start()
+    {
+        StartCoroutine(ReadCSV(Path.Combine(Application.streamingAssetsPath, "WordAssets/10k-sfw.txt")));
     }
 
-    private static void ReadCSV(string path)
+    private IEnumerator ReadCSV(string path)
     {
-        string[] textLines;
+        uwr = UnityWebRequest.Get(path);
 
-        #region WebGL Build
-        UnityWebRequest uwr = UnityWebRequest.Get(path);
+        yield return uwr.SendWebRequest();
+        
+        if (uwr.isDone)
+        {
+            _dictionary.AddRange(uwr.downloadHandler.text.Split("\n"));
+            _dictionary = _dictionary.Select(x => x.Trim()).ToList();
+            Debug.Log($"Total Words: {_dictionary.Count}");
+        }
 
-        uwr.SendWebRequest();
-        textLines = uwr.downloadHandler.text.Split('\u002C');
-        _dictionary.AddRange(textLines);
+        Debug.Log("Download Complete!");
+        IsDone = uwr.isDone;
+    }
 
-       
+    private IEnumerator IsRequestDone(int length)
+    {    
+        while (!IsDone)
+        {
+            yield return new WaitForSeconds(0.5f);
+        }
 
-        #endregion
+        Debug.Log("Generating...");
 
-        #region Windows Build
+        var filteredDictionary = _dictionary.Where(s => s.Length <= length && s.Length >= 3).ToList();
+        var candidateWord = filteredDictionary.Where(s => s.Length == length).ToList();
 
-        //StreamReader streamReader = new(path);
-        //bool eof = false;
+        letters = candidateWord[UnityEngine.Random.Range(1, candidateWord.Count)];
+        var wordLookup = letters.ToCharArray().ToLookup(c => c);
 
-        //while (!eof)
-        //{
-        //    string dataString = streamReader.ReadLine();
-        //    if (dataString == null)
-        //    {
-        //        //eof = true;
-        //        return;
-        //    }
-
-        //    string[] values = dataString.Split('\u002C');
-
-        //    _dictionary.AddRange(values);
-        //}
-        #endregion
+        wordSet = filteredDictionary.Where(w => w.ToLookup(c => c).All(wc => wc.Count() <= wordLookup[wc.Key].Count())).OrderBy(s => s.Length).ToList();
+        Debug.Log($"Wordset done: {wordSet.Count}");
     }
 
     public void GenerateFromLetters(string chars)
     {
+        //StartCoroutine(IsRequestDone());
+
         letters = chars;
         var filteredDictionary = _dictionary.Where(s => s.Length <= chars.Length && s.Length >= 3);
         var mainLookup = chars.ToCharArray().ToLookup(c => c);
@@ -74,12 +82,6 @@ public class WordsetGenerator
 
     public void GenerateFromLength(int length)
     {
-        var filteredDictionary = _dictionary.Where(s => s.Length <= length && s.Length >= 3).ToList();
-        var candidateWord = filteredDictionary.Where(s => s.Length == length).ToList();
-
-        letters = candidateWord[Random.Range(1, candidateWord.Count)];
-        var wordLookup = letters.ToCharArray().ToLookup(c => c);
-
-        wordSet = filteredDictionary.Where(w => w.ToLookup(c => c).All(wc => wc.Count() <= wordLookup[wc.Key].Count())).OrderBy(s => s.Length).ToList();
+        StartCoroutine(IsRequestDone(length));
     }
 }

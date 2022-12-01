@@ -153,7 +153,10 @@ public class LettersSelection : MonoBehaviour
         givenLetters = letters;
 
         displayedLetters = ShuffleLetters(givenLetters.ToCharArray());
-
+        foreach (var item in displayedLetters)
+        {
+            Debug.Log(item);
+        }
         validKeys.AddRange(displayedLetters.Distinct().Select(l => Enum.Parse<KeyCode>($"{l}", true)));
 
         for (int i = 0; i < displayedLetters.Count; i++)
