@@ -151,9 +151,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void UpdateScore()
+    private void UpdateScore(string guess)
     {
-        wordScore += 100 * ScoreMultipler(inputField.text);
+        wordScore += 100 * ScoreMultipler(guess);
         scoreDisplay.text = $"Score: {wordScore}";
     }
 
@@ -289,7 +289,7 @@ public class GameManager : MonoBehaviour
                 correctGuesses.Add(wordGuess);
                 EventsManager.CorrectGuessEvent(correctGuesses);
 
-                UpdateScore();
+                UpdateScore(wordGuess);
                 UpdateRemaining();
 
                 if (words.Count() == correctGuesses.Count())
@@ -351,6 +351,7 @@ public class GameManager : MonoBehaviour
     {
         lives = 3;
         round = 1;
+        wordScore = 0;
         scoreDisplay.text = "Score: 0";
         inputField.text = string.Empty;
     }
