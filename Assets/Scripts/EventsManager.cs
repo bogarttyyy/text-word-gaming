@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,6 +13,8 @@ public class EventsManager : MonoBehaviour
 
     public static event Action OnTextInput;
     public static event Action OnTextDelete;
+
+    public static event Action<LetterObj> OnLetterTouchEvent;
 
     public static event Action OnDebugEvent;
 
@@ -68,5 +69,10 @@ public class EventsManager : MonoBehaviour
     internal static void TextDeleteEvent()
     {
         OnTextDelete?.Invoke();
+    }
+
+    internal static void LetterTouchedEvent(LetterObj getComponent)
+    {
+        OnLetterTouchEvent?.Invoke(getComponent);
     }
 }

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1381702760914749056}
   - component: {fileID: 1381702760914749059}
   - component: {fileID: 2001665225837901845}
+  - component: {fileID: 2484545381512837875}
   m_Layer: 5
   m_Name: LetterObject
   m_TagString: Untagged
@@ -97,3 +98,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5291e4a9b1e58064a914fb850629c210, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  keyCode: 63
+  displayPosition: {x: 0, y: 0, z: 0}
+  typedPosition: {x: 0, y: 0, z: 0}
+  isTyped: 0
+--- !u!58 &2484545381512837875
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1381702760914749057}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.5

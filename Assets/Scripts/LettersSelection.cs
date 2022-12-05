@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SubsystemsImplementation;
 
 public class LettersSelection : MonoBehaviour
@@ -52,7 +53,6 @@ public class LettersSelection : MonoBehaviour
     [SerializeField]
     private List<LetterObj> letterObjs = new();
 
-
     private void Start()
     {
         // Initial loading of all KeyCodes (Saving to memory)
@@ -80,6 +80,28 @@ public class LettersSelection : MonoBehaviour
                     MoveToNextAvailablePosition(TypedLetter(key));
                 }
             }
+        }
+    }
+
+    private void OnEnable()
+    {
+        EventsManager.OnLetterTouchEvent += LetterTouched;
+    }
+
+    private void OnDisable()
+    {
+        EventsManager.OnLetterTouchEvent -= LetterTouched;
+    }
+
+    private void LetterTouched(LetterObj obj)
+    {
+        if (!obj.isTyped)
+        {
+            MoveToNextAvailablePosition(TypedLetter(obj.keyCode));
+        }
+        else
+        {
+
         }
     }
 
@@ -123,7 +145,7 @@ public class LettersSelection : MonoBehaviour
         return typedKey;
     }
 
-    private void DeleteCharacter()
+    public void DeleteCharacter()
     {
         if (typedLetters.Any())
         {

@@ -273,6 +273,11 @@ public class GameManager : MonoBehaviour
         textDisplay.ClearTyped();
     }
 
+    public void DeleteCharacter()
+    {
+       textDisplay.DeleteCharacter();
+    }
+
     public void EnterGuess()
     {
         string wordGuess = textDisplay.GetGuess();
